@@ -72,8 +72,10 @@ class FlutterDemoState extends State<FlutterDemo> {
           new Flexible(
             child: new ScrollableMixedWidgetList(
               builder: (BuildContext context, int index) {
-                print("Building index: $index");
-                return new FancyItem(index, key: new ValueKey("Item $index"));
+                if (index % 2 == 0)
+                  return new FancyImageItem(index, key: new ValueKey("Item $index"));
+                else
+                  return new FancyGalleryItem(index, key: new ValueKey("Item $index"));
               }
             )
           ),
@@ -159,9 +161,9 @@ class MenuItemWithIcon extends StatelessWidget {
   }
 }
 
-class FancyItem extends StatelessWidget {
+class FancyImageItem extends StatelessWidget {
 
-  FancyItem(this.index, {Key key}) : super(key: key);
+  FancyImageItem(this.index, {Key key}) : super(key: key);
 
   final int index;
 
@@ -172,6 +174,29 @@ class FancyItem extends StatelessWidget {
         new UserHeader("Ali Connors $index"),
         new ItemDescription(),
         new ItemImageBox(),
+        new InfoBar(),
+        new Padding(
+          padding: new EdgeInsets.symmetric(horizontal: 8.0),
+          child: new Divider()
+        ),
+        new IconBar(),
+        new FatDivider()
+      ]
+    );
+  }
+}
+
+class FancyGalleryItem extends StatelessWidget {
+
+  FancyGalleryItem(this.index, {Key key}) : super(key: key);
+
+  final int index;
+  @override
+  Widget build(BuildContext context) {
+    return new BlockBody(
+      children: <Widget>[
+        new UserHeader("Ali Connors"),
+        new ItemGalleryBox(index),
         new InfoBar(),
         new Padding(
           padding: new EdgeInsets.symmetric(horizontal: 8.0),
@@ -403,6 +428,83 @@ class ItemImageBox extends StatelessWidget {
               )
             )
           ]
+        )
+      )
+    );
+  }
+}
+
+class ItemGalleryBox extends StatelessWidget {
+  ItemGalleryBox(this.index);
+
+  final int index;
+
+  @override
+  Widget build(BuildContext context) {
+    List<String>tabNames = <String>[
+      "A", "B", "C", "D"
+    ];
+
+    return new SizedBox(
+      height: 200.0,
+      child: new TabBarSelection<String>(
+        values: tabNames,
+        child: new Builder(
+          builder: (BuildContext context) {
+            return new Column(
+              children: <Widget>[
+                new Flexible(
+                  child: new TabBarView(
+                    children: tabNames.map((String tabName) {
+                      return new Container(
+                        key: new ValueKey("Tab $index - $tabName"),
+                        child: new Padding(
+                          padding: new EdgeInsets.all(8.0),
+                          child: new Card(
+                            child: new Column(
+                              children: <Widget>[
+                                new Flexible(
+                                  child: new Container(
+                                    decoration: new BoxDecoration(
+                                      backgroundColor: Theme.of(context).primaryColor
+                                    ),
+                                    child: new Center(
+                                      child: new Text(tabName, style: Theme.of(context).textTheme.headline.copyWith(color: Colors.white))
+                                    )
+                                  )
+                                ),
+                                new Row(
+                                  children: <Widget>[
+                                    new IconButton(
+                                      icon: Icons.share,
+                                      onPressed: () { print("Pressed share"); }
+                                    ),
+                                    new IconButton(
+                                      icon: Icons.event,
+                                      onPressed: () { print("Pressed event"); }
+                                    ),
+                                    new Flexible(
+                                      child: new Padding(
+                                        padding: new EdgeInsets.only(left: 8.0),
+                                        child: new Text("This is item $tabName")
+                                      )
+                                    )
+                                  ]
+                                )
+                              ]
+                            )
+                          )
+                        )
+                      );
+                    }).toList()
+                  )
+                ),
+                new Container(
+                  child: new TabPageSelector<String>()
+                )
+              ]
+            );
+          }
         )
       )
     );
